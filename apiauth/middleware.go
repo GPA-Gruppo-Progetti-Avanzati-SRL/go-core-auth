@@ -58,6 +58,13 @@ func New(authorizer coreauth.Authorizer, cfg *coreauth.MiddlewareConfig) *Middle
 // Un m nullo significa autorizzazione spenta in configurazione: non si monta nulla, e non è un
 // errore. Un'API può non avere autorizzazione.
 func Register(r *coreapi.Router, m *Middleware) {
+	// Il seed delle capability non dipende dal middleware: descrive ciò che l'API espone, e serve
+	// anche a un'applicazione che l'autorizzazione non l'ha ancora accesa — è anzi il momento in
+	// cui serve di più, perché è da lì che si popola l'ACL.
+	if r.DevelopMode {
+		mountSeed(r)
+	}
+
 	if m == nil {
 		log.Info().Msg("autorizzazione: middleware non attivo, nessun controllo sulle rotte")
 		return

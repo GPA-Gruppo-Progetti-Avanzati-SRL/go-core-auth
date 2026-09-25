@@ -167,8 +167,8 @@ func TestNew_DisabilitatoNonCostruisceNulla(t *testing.T) {
 		t.Error("senza sezione middleware il middleware non deve esistere")
 	}
 	// Register con un middleware nullo non deve esplodere: è il caso normale di un'app senza
-	// autorizzazione, e il wiring lo chiama comunque.
-	Register(nil, nil)
+	// autorizzazione, e il wiring lo chiama comunque — col Router vero, che c'è sempre.
+	Register(&coreapi.Router{}, nil)
 }
 
 func TestToken_RichiedeAppId(t *testing.T) {

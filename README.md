@@ -183,18 +183,32 @@ che è la dichiarazione esplicita.
 
 ## Seed delle capability
 
-Le capability di un microservizio le genera `go-core-api` dagli endpoint registrati, in
-develop-mode:
+`apiauth.Register` monta in develop-mode due endpoint che generano il seed delle capability
+dell'applicazione:
 
 | Endpoint | Destinatario |
 |---|---|
 | `GET /acl.coreauth.sql` | le tabelle `acl_*` di `sqlsource` |
 | `GET /acl.coreauth.js` | la collection `acl` di `mongosource` |
-| `GET /acl.sql`, `GET /acl.mongo.js` | il **frontdoor OPEM** (`opem_acl_*`, `_et: cap-def`) — altro schema, altro consumatore |
-| `GET /capabilities`, `/capabilities.yaml` | il resto della catena (discovery del gateway) |
 
-I primi due sono distinti dagli altri perché i due mondi hanno schemi diversi e destinatari
-diversi: un generatore solo produrrebbe per l'uno un seed che l'altro non sa leggere.
+La serializzazione sta qui e non in `go-core-api` perché **lo schema è di questa libreria**: i nomi
+delle tabelle e la forma dei documenti li stabiliscono `sqlsource` e `mongosource`, e un generatore
+che li scrivesse da un altro modulo sarebbe una seconda dichiarazione dello stesso schema. Di
+`go-core-api` arriva soltanto ciò che solo lui può sapere — quali capability l'API espone, dedotte
+dal registry huma (`coreapi.Capabilities`, `coreapi.CapabilityID`). Il presidio dell'allineamento è
+in `seed_test.go`, che confronta le colonne generate con `sqlsource.Schema()`.
+
+I seed sono montati anche quando il middleware è spento: descrivono ciò che l'API espone, e servono
+soprattutto a un'applicazione che l'autorizzazione non l'ha ancora accesa — è da lì che si popola
+l'ACL.
+
+`go-core-api` conserva i propri `GET /acl.sql` e `GET /acl.mongo.js`, che hanno un altro
+destinatario (il **frontdoor OPEM**: `opem_acl_*`, `_et: cap-def`) e un altro schema, più
+`/capabilities` e `/capabilities.yaml` per la discovery del gateway.
+
+Nessuno dei due seed assegna capability a un ruolo: creano le capability e il gruppo che le
+raccoglie. Assegnare quel gruppo a un ruolo resta un atto esplicito di chi governa l'ACL — ed è la
+ragione per cui eseguirli non concede permessi a nessuno.
 
 Lo script **non assegna nulla ad alcun ruolo**: crea le capability e il gruppo che le raccoglie.
 Assegnare il gruppo a un ruolo resta un atto esplicito di chi governa l'ACL — ed è la ragione per
