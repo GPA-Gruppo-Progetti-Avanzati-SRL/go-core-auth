@@ -110,10 +110,26 @@ direzioni: al boot si nega tutto, a regime si continua con l'ultimo ACL valido.
 
 ## Middleware HTTP (`apiauth`)
 
-`go-core-api` monta ciò che questo package fornisce; il montaggio resta suo perché la `huma.API` la
-possiede lui. Il middleware riconosce identità, ruoli e contesto dagli header, riduce i ruoli al
-contesto presentato e autorizza la rotta. Se non c'è nulla da montare non monta nulla, e non è un
-errore.
+Il middleware riconosce identità, ruoli e contesto dagli header, riduce i ruoli al contesto
+presentato e autorizza la rotta. Si monta da sé, attraverso il seam che `go-core-api` ha già:
+
+```go
+coreauth.Module(&svc.Auth,
+    coreauth.WithSource(mongosource.Module),
+    coreauth.WithMiddleware(apiauth.Module))   // fornisce il *Middleware a fx
+
+coreapi.Module(&svc.Api,
+    coreapi.WithRoutes(apiauth.Register),      // func(*coreapi.Router, *apiauth.Middleware)
+    coreapi.WithRoutes(routes.Register))
+```
+
+**La dipendenza va da qui verso `go-core-api`, mai al contrario**: un middleware è un plugin del
+framework HTTP, e il framework non conosce i suoi plugin. `coreapi.WithRoutes[B]` risolve `B` da fx
+per tipo, quindi per quel seam il middleware è un business come un altro e non c'è stato nulla da
+inventare. È anche ciò che tiene `go-core-api` dipendente dal solo `go-core-app`.
+
+Se il middleware non è attivo in configurazione, `Register` non monta nulla e lo dice con un log:
+un'API può non avere autorizzazione, e non è un errore.
 
 I valori finiscono nel context della richiesta sotto chiavi di **tipo privato**, non stringhe, e si
 leggono con gli accessor:
@@ -147,6 +163,7 @@ sui ruoli del contesto corrente, perché descrivono ciò che si può fare qui e 
 | `mongosource` | collection `acl`, tipo di entità nel campo `_et` | `go-core-mongo` |
 | `sqlsource` | otto tabelle `acl_*` | `go-core-sql` (bun) |
 | `yamlsource` | un file YAML, riletto a ogni ricaricamento | `go.yaml.in/yaml/v3` |
+| `apiauth` | — (middleware, non sorgente) | `go-core-api`, huma |
 
 **mongo** — un'unica `find({})`: l'ACL è piccolo e la sua coerenza interna conta più del numero di
 documenti letti. Il percorso di lettura non ha bisogno di indici. Seed, validator e indici di

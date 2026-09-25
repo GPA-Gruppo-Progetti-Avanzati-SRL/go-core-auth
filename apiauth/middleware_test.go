@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	coreapi "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api"
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/humatest"
@@ -47,8 +48,17 @@ type probe struct {
 // newTestAPI monta il middleware e una rotta che riporta ciò che ha trovato nel context.
 func newTestAPI(t *testing.T, m *Middleware) humatest.TestAPI {
 	t.Helper()
-	_, api := humatest.New(t, huma.DefaultConfig("test", "1.0.0"))
-	m.Register(api, nil)
+	cfg := huma.DefaultConfig("test", "1.0.0")
+	// Come fa il Router di coreapi in entrambi i suoi rami: senza, lo SchemaLinkTransformer dei
+	// CreateHooks gira a ogni registrazione e va in nil-pointer sugli schema delle response
+	// standard. Una config diversa da quella reale darebbe un test che fallisce dove il prodotto
+	// non fallisce.
+	cfg.CreateHooks = nil
+
+	_, api := humatest.New(t, cfg)
+	// Un *coreapi.Router costruito a mano: Register riceve dal wiring reale lo stesso valore, e
+	// passando di lì il test esercita anche il merge delle response d'errore standard.
+	Register(&coreapi.Router{Api: api}, m)
 	huma.Get(api, "/probe", func(ctx context.Context, _ *struct{}) (*probeOutput, error) {
 		return &probeOutput{Body: probe{
 			User: UserFrom(ctx), Roles: RolesFrom(ctx), ContextID: ContextIDFrom(ctx),
@@ -156,9 +166,9 @@ func TestNew_DisabilitatoNonCostruisceNulla(t *testing.T) {
 	if m := New(&stubAuthorizer{}, nil); m != nil {
 		t.Error("senza sezione middleware il middleware non deve esistere")
 	}
-	// Register su un middleware nullo non deve esplodere: è il caso normale di un'app senza
-	// autorizzazione, e il router lo chiama comunque.
-	(*Middleware)(nil).Register(nil, nil)
+	// Register con un middleware nullo non deve esplodere: è il caso normale di un'app senza
+	// autorizzazione, e il wiring lo chiama comunque.
+	Register(nil, nil)
 }
 
 func TestToken_RichiedeAppId(t *testing.T) {

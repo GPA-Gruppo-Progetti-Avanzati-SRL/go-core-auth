@@ -1,19 +1,28 @@
 // Package apiauth espone l'autorizzazione come middleware HTTP e come endpoint del token di
-// sessione. È il solo package di go-core-auth che dipende da huma: un'applicazione che non serve
-// un'API non lo importa e non se lo porta nel grafo.
+// sessione. È il solo package di go-core-auth che dipende da huma e da go-core-api:
+// un'applicazione che non serve un'API non lo importa e non se li porta nel grafo.
 //
 //	coreauth.Module(&svc.Auth,
 //	    coreauth.WithSource(mongosource.Module),
 //	    coreauth.WithMiddleware(apiauth.Module))
 //
-// Il montaggio sul router spetta a go-core-api, che è l'unico a possedere la huma.API.
+//	coreapi.Module(&svc.Api,
+//	    coreapi.WithRoutes(apiauth.Register),
+//	    coreapi.WithRoutes(routes.Register))
+//
+// La dipendenza va in questa direzione e non nell'altra: un middleware è un plugin del framework
+// HTTP, e il framework non conosce i suoi plugin. Il montaggio passa da `coreapi.WithRoutes`, che
+// risolve da fx il secondo parametro per tipo — per quel seam il middleware è un business come un
+// altro, e non c'è stato nulla da inventare.
 package apiauth
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
 
+	coreapi "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api"
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/rs/zerolog/log"
@@ -41,22 +50,27 @@ func New(authorizer coreauth.Authorizer, cfg *coreauth.MiddlewareConfig) *Middle
 	return &Middleware{authorizer: authorizer, cfg: cfg, guestPaths: guest}
 }
 
-// Register monta il middleware sulla huma.API e registra l'endpoint del token.
+// Register monta il middleware sul router e registra l'endpoint del token. Ha la firma che
+// coreapi.WithRoutes si aspetta, quindi si passa direttamente:
 //
-// withDefaults, se passata, arricchisce l'operazione con le response d'errore standard di chi
-// ospita l'API: è la sola cosa che apiauth non può sapere, perché appartiene al vocabolario del
-// framework HTTP e non a quello dell'autorizzazione.
-func (m *Middleware) Register(api huma.API, withDefaults func(huma.Operation) huma.Operation) {
+//	coreapi.WithRoutes(apiauth.Register)
+//
+// Un m nullo significa autorizzazione spenta in configurazione: non si monta nulla, e non è un
+// errore. Un'API può non avere autorizzazione.
+func Register(r *coreapi.Router, m *Middleware) {
 	if m == nil {
+		log.Info().Msg("autorizzazione: middleware non attivo, nessun controllo sulle rotte")
 		return
 	}
-	api.UseMiddleware(m.handle)
+	r.Api.UseMiddleware(m.handle)
 
-	op := tokenOperation()
-	if withDefaults != nil {
-		op = withDefaults(op)
-	}
-	huma.Register(api, op, m.token)
+	// Passa da RegisterWithBusiness e non da huma.Register perché è lì che coreapi merge le
+	// response d'errore standard: il token non ha ragione di rispondere agli errori in una forma
+	// diversa dal resto dell'API.
+	coreapi.RegisterWithBusiness(r, m, tokenOperation(),
+		func(ctx context.Context, in *tokenInput, mw *Middleware) (*RawStringOutput, error) {
+			return mw.token(ctx, in)
+		})
 }
 
 // handle è il middleware: riconosce l'identità dalla richiesta, riduce i ruoli al contesto
