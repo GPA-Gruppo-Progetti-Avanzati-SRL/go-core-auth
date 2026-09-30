@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20260930105625-13fa3448c383
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20260930105232-67b4143d76d8
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20260930140542-5b06937a5101
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20260930105625-aace142a2a35
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20260930105625-8efb2abc07d5
 	github.com/danielgtaylor/huma/v2 v2.39.1
