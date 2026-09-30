@@ -10,7 +10,8 @@ package mongosource
 import (
 	"context"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	coremongo "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo"
 	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo/mongoutil"
@@ -18,8 +19,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
-var liberr = core.Errors{Ambit: Ambit}
+// errs costruisce gli errori del package con l'ambito della libreria (vedi core.AmbitErrors).
+var errs = core.AmbitErrors{Ambit: Ambit}
 
 // Ambit e codici degli errori di questo backend.
 const (
@@ -39,22 +40,22 @@ type source struct {
 //
 // Una query sola e non una per entità: l'ACL è piccolo e la sua coerenza interna conta — ruoli che
 // nominano capability lette in un secondo momento sarebbero uno snapshot che non è mai esistito.
-func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.ApplicationError) {
+func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.Error) {
 	coll := s.svc.GetCollection(s.collection, "")
 	if coll == nil {
-		return nil, liberr.Tech(CodeCollectionNotFound).
+		return nil, errs.Tech(CodeCollectionNotFound).
 			WithMessage("collection '" + s.collection + "' non configurata nel linked service mongo")
 	}
 
 	cur, err := coll.Find(ctx, bson.M{})
 	if err != nil {
-		return nil, liberr.Tech(CodeFind).WithCause(err)
+		return nil, errs.Tech(CodeFind).WithCause(err)
 	}
 	defer mongoutil.CloseCursor(ctx, cur, "mongosource.Load/acl")
 
 	var docs []aclDoc
 	if err := cur.All(ctx, &docs); err != nil {
-		return nil, liberr.Tech(CodeCursor).WithCause(err)
+		return nil, errs.Tech(CodeCursor).WithCause(err)
 	}
 
 	return toSnapshot(docs), nil

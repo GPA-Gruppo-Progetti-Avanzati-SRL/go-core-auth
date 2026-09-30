@@ -15,13 +15,14 @@ import (
 	"context"
 	"os"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"go.yaml.in/yaml/v3"
 )
 
-// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
-var liberr = core.Errors{Ambit: Ambit}
+// errs costruisce gli errori del package con l'ambito della libreria (vedi core.AmbitErrors).
+var errs = core.AmbitErrors{Ambit: Ambit}
 
 // Ambit e codici degli errori di questo backend.
 const (
@@ -49,20 +50,20 @@ type source struct {
 }
 
 // Load rilegge il file e lo fonde col catalogo.
-func (s *source) Load(context.Context) (*coreauth.Snapshot, *core.ApplicationError) {
+func (s *source) Load(context.Context) (*coreauth.Snapshot, *core.Error) {
 	if s.path == "" {
-		return nil, liberr.Tech(CodeNoRules).
+		return nil, errs.Tech(CodeNoRules).
 			WithMessage("nessun file delle regole configurato: valorizzare services.auth.yaml.rules-file")
 	}
 
 	data, err := os.ReadFile(s.path)
 	if err != nil {
-		return nil, liberr.Tech(CodeReadRules).WithCause(err)
+		return nil, errs.Tech(CodeReadRules).WithCause(err)
 	}
 
 	var rules rulesFile
 	if err := yaml.Unmarshal(data, &rules); err != nil {
-		return nil, liberr.Tech(CodeParseRules).WithCause(err)
+		return nil, errs.Tech(CodeParseRules).WithCause(err)
 	}
 
 	return merge(rules, s.catalog), nil

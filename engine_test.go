@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
 )
 
 // fakeSource restituisce lo snapshot che il test gli mette in mano, o un errore.
@@ -17,7 +17,7 @@ type fakeSource struct {
 	calls atomic.Int32
 }
 
-func (f *fakeSource) Load(context.Context) (*Snapshot, *core.ApplicationError) {
+func (f *fakeSource) Load(context.Context) (*Snapshot, *core.Error) {
 	f.calls.Add(1)
 	if f.fail.Load() {
 		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeSourceLoad).

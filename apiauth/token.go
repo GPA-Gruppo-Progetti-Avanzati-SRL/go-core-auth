@@ -6,13 +6,15 @@ import (
 	"encoding/json"
 	"net/http"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app/utils"
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"github.com/danielgtaylor/huma/v2"
 )
 
-// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
-var liberr = core.Errors{Ambit: coreauth.Ambit}
+// errs costruisce gli errori del package con l'ambito della libreria (vedi core.AmbitErrors).
+var errs = core.AmbitErrors{Ambit: coreauth.Ambit}
 
 // TokenPath è la rotta dell'endpoint del token di sessione.
 const TokenPath = "/api/token"
@@ -85,12 +87,12 @@ func (m *Middleware) token(ctx context.Context, in *tokenInput) (*RawStringOutpu
 
 	b, err := json.Marshal(body)
 	if err != nil {
-		return nil, liberr.Tech(coreauth.CodeTokenEncryption).WithCause(err)
+		return nil, errs.Tech(coreauth.CodeTokenEncryption).WithCause(err)
 	}
 
-	cipherText, err := core.Encrypt(b, in.AppID)
+	cipherText, err := utils.Encrypt(b, in.AppID)
 	if err != nil {
-		return nil, liberr.Tech(coreauth.CodeTokenEncryption).WithCause(err)
+		return nil, errs.Tech(coreauth.CodeTokenEncryption).WithCause(err)
 	}
 
 	return &RawStringOutput{

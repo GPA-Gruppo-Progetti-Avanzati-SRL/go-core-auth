@@ -13,13 +13,14 @@ import (
 	"context"
 	"strings"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"github.com/uptrace/bun"
 )
 
-// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
-var liberr = core.Errors{Ambit: Ambit}
+// errs costruisce gli errori del package con l'ambito della libreria (vedi core.AmbitErrors).
+var errs = core.AmbitErrors{Ambit: Ambit}
 
 // Ambit e codici degli errori di questo backend.
 const (
@@ -38,7 +39,7 @@ type source struct {
 // potrebbero essere lette dopo una modifica che le entità non hanno visto, e lo Snapshot
 // descriverebbe un ACL che non è mai esistito — un ruolo che referenzia un gruppo appena
 // cancellato, o una capability che nessuno possiede più.
-func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.ApplicationError) {
+func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.Error) {
 	var (
 		contexts   []contextRow
 		apps       []appRow
@@ -61,7 +62,7 @@ func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.Applicatio
 		return nil
 	})
 	if err != nil {
-		return nil, liberr.Tech(CodeSelect).WithCause(err)
+		return nil, errs.Tech(CodeSelect).WithCause(err)
 	}
 
 	return toSnapshot(contexts, apps, caps, groups, groupItems, roles, roleGroups, roleCaps), nil
@@ -150,10 +151,10 @@ func splitMethods(s string) []string {
 // È esplicita e non automatica al boot: creare tabelle è una modifica allo schema, e in un
 // ambiente con migrazioni gestite deve restare una scelta di chi le governa. Le applicazioni che
 // non ne hanno la chiamano una volta all'avvio.
-func EnsureTables(ctx context.Context, db *bun.DB) *core.ApplicationError {
+func EnsureTables(ctx context.Context, db *bun.DB) *core.Error {
 	for _, model := range tables() {
 		if _, err := db.NewCreateTable().Model(model).IfNotExists().Exec(ctx); err != nil {
-			return liberr.Tech(CodeEnsureDDL).WithCause(err)
+			return errs.Tech(CodeEnsureDDL).WithCause(err)
 		}
 	}
 	return nil

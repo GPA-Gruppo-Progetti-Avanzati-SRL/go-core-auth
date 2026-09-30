@@ -8,12 +8,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
+
 	"github.com/rs/zerolog/log"
 )
 
-// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
-var liberr = core.Errors{Ambit: Ambit}
+// errs costruisce gli errori del package con l'ambito della libreria (vedi core.AmbitErrors).
+var errs = core.AmbitErrors{Ambit: Ambit}
 
 // lut è l'implementazione di Authorizer: una view risolta, sostituita in blocco quando scade.
 //
@@ -44,7 +45,7 @@ func newLUT(src Source, refresh, timeout time.Duration) *lut {
 // della vecchia, o la vecchia resta esattamente com'era. È l'invariante che rende osservabile una
 // revoca (ciò che non è più nell'ACL sparisce) e innocuo un backend momentaneamente illeggibile
 // (si continua a decidere sullo snapshot precedente, e il log lo dice).
-func (l *lut) load(ctx context.Context) *core.ApplicationError {
+func (l *lut) load(ctx context.Context) *core.Error {
 	l.mu.Lock()
 	if l.updating.Load() {
 		l.mu.Unlock()
@@ -62,7 +63,7 @@ func (l *lut) load(ctx context.Context) *core.ApplicationError {
 		return err
 	}
 	if snap == nil {
-		return liberr.Tech(CodeSourceLoad).
+		return errs.Tech(CodeSourceLoad).
 			WithMessage("la sorgente ACL ha restituito uno snapshot nullo senza errore")
 	}
 
