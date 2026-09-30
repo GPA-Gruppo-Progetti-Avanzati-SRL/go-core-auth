@@ -156,6 +156,14 @@ chiave. Le tre domande non usano gli stessi ruoli, ed è voluto: le **app naviga
 su *tutti* i ruoli, perché "dove posso andare" precede la scelta del contesto; **menu e comandi**
 sui ruoli del contesto corrente, perché descrivono ciò che si può fare qui e ora.
 
+> **Il token è offuscato, non riservato.** La chiave è SHA-256 dell'`AppId`, cioè di un valore che
+> viaggia in chiaro nell'header della stessa richiesta ed è noto a ogni client dell'app: chiunque
+> legga la risposta può decifrarla. Non è quindi un segreto né una prova d'identità (non è firmato), e
+> non deve contenere nulla che il chiamante non possa già vedere — oggi porta l'utente, il contesto,
+> i ruoli e ciò che quei ruoli abilitano, cioè esattamente la sua vista. Il formato
+> (AES-256-GCM, nonce‖ciphertext in esadecimale) resta questo perché il frontdoor lo decifra così;
+> la riservatezza sul filo è di TLS.
+
 ## I backend
 
 | Package | Sorgente | Dipendenza |

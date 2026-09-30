@@ -63,6 +63,13 @@ func tokenOperation() huma.Operation {
 
 // token risponde con identità e permessi dell'utente, cifrati con l'AppID come chiave.
 //
+// La cifratura è OFFUSCAMENTO, non riservatezza: la chiave è SHA-256 dell'AppID, che viaggia in
+// chiaro nell'header della stessa richiesta ed è noto a ogni client dell'app — chiunque legga la
+// risposta può decifrarla. Il token non va quindi trattato come un segreto né come una prova
+// d'identità (non è firmato per il destinatario: il contenuto viene dal middleware che ha già
+// autorizzato la richiesta), e non deve portare nulla che il chiamante non possa già vedere. Il
+// formato resta questo perché il frontdoor lo decifra così; la protezione del canale è TLS.
+//
 // Le tre domande non usano gli stessi ruoli, ed è voluto: le app navigabili si calcolano su TUTTI
 // i ruoli, perché la domanda "dove posso andare" precede la scelta del contesto; menu e comandi si
 // calcolano sui ruoli del contesto corrente, perché descrivono ciò che si può fare qui e ora.
