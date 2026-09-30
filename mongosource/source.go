@@ -18,6 +18,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
+// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
+var liberr = core.Errors{Ambit: Ambit}
+
 // Ambit e codici degli errori di questo backend.
 const (
 	Ambit                  = "go-core-auth/mongosource"
@@ -39,19 +42,19 @@ type source struct {
 func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.ApplicationError) {
 	coll := s.svc.GetCollection(s.collection, "")
 	if coll == nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeCollectionNotFound).
+		return nil, liberr.Tech(CodeCollectionNotFound).
 			WithMessage("collection '" + s.collection + "' non configurata nel linked service mongo")
 	}
 
 	cur, err := coll.Find(ctx, bson.M{})
 	if err != nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeFind).WithCause(err)
+		return nil, liberr.Tech(CodeFind).WithCause(err)
 	}
 	defer mongoutil.CloseCursor(ctx, cur, "mongosource.Load/acl")
 
 	var docs []aclDoc
 	if err := cur.All(ctx, &docs); err != nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeCursor).WithCause(err)
+		return nil, liberr.Tech(CodeCursor).WithCause(err)
 	}
 
 	return toSnapshot(docs), nil

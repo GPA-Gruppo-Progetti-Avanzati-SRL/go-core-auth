@@ -11,6 +11,9 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
+// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
+var liberr = core.Errors{Ambit: coreauth.Ambit}
+
 // TokenPath è la rotta dell'endpoint del token di sessione.
 const TokenPath = "/api/token"
 
@@ -82,14 +85,12 @@ func (m *Middleware) token(ctx context.Context, in *tokenInput) (*RawStringOutpu
 
 	b, err := json.Marshal(body)
 	if err != nil {
-		return nil, core.TechnicalError().WithAmbit(coreauth.Ambit).
-			WithCode(coreauth.CodeTokenEncryption).WithCause(err)
+		return nil, liberr.Tech(coreauth.CodeTokenEncryption).WithCause(err)
 	}
 
 	cipherText, err := core.Encrypt(b, in.AppID)
 	if err != nil {
-		return nil, core.TechnicalError().WithAmbit(coreauth.Ambit).
-			WithCode(coreauth.CodeTokenEncryption).WithCause(err)
+		return nil, liberr.Tech(coreauth.CodeTokenEncryption).WithCause(err)
 	}
 
 	return &RawStringOutput{

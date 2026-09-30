@@ -12,6 +12,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
+var liberr = core.Errors{Ambit: Ambit}
+
 // lut è l'implementazione di Authorizer: una view risolta, sostituita in blocco quando scade.
 //
 // Il ricaricamento è lazy-on-read — lo innesca il primo lettore che trova la view scaduta, in
@@ -59,7 +62,7 @@ func (l *lut) load(ctx context.Context) *core.ApplicationError {
 		return err
 	}
 	if snap == nil {
-		return core.TechnicalError().WithAmbit(Ambit).WithCode(CodeSourceLoad).
+		return liberr.Tech(CodeSourceLoad).
 			WithMessage("la sorgente ACL ha restituito uno snapshot nullo senza errore")
 	}
 

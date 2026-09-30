@@ -18,6 +18,9 @@ import (
 	"github.com/uptrace/bun"
 )
 
+// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
+var liberr = core.Errors{Ambit: Ambit}
+
 // Ambit e codici degli errori di questo backend.
 const (
 	Ambit         = "go-core-auth/sqlsource"
@@ -58,7 +61,7 @@ func (s *source) Load(ctx context.Context) (*coreauth.Snapshot, *core.Applicatio
 		return nil
 	})
 	if err != nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeSelect).WithCause(err)
+		return nil, liberr.Tech(CodeSelect).WithCause(err)
 	}
 
 	return toSnapshot(contexts, apps, caps, groups, groupItems, roles, roleGroups, roleCaps), nil
@@ -150,7 +153,7 @@ func splitMethods(s string) []string {
 func EnsureTables(ctx context.Context, db *bun.DB) *core.ApplicationError {
 	for _, model := range tables() {
 		if _, err := db.NewCreateTable().Model(model).IfNotExists().Exec(ctx); err != nil {
-			return core.TechnicalError().WithAmbit(Ambit).WithCode(CodeEnsureDDL).WithCause(err)
+			return liberr.Tech(CodeEnsureDDL).WithCause(err)
 		}
 	}
 	return nil

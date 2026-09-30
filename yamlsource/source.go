@@ -20,6 +20,9 @@ import (
 	"go.yaml.in/yaml/v3"
 )
 
+// liberr costruisce gli errori del package con l'ambito della libreria (vedi core.Errors).
+var liberr = core.Errors{Ambit: Ambit}
+
 // Ambit e codici degli errori di questo backend.
 const (
 	Ambit          = "go-core-auth/yamlsource"
@@ -48,18 +51,18 @@ type source struct {
 // Load rilegge il file e lo fonde col catalogo.
 func (s *source) Load(context.Context) (*coreauth.Snapshot, *core.ApplicationError) {
 	if s.path == "" {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeNoRules).
+		return nil, liberr.Tech(CodeNoRules).
 			WithMessage("nessun file delle regole configurato: valorizzare services.auth.yaml.rules-file")
 	}
 
 	data, err := os.ReadFile(s.path)
 	if err != nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeReadRules).WithCause(err)
+		return nil, liberr.Tech(CodeReadRules).WithCause(err)
 	}
 
 	var rules rulesFile
 	if err := yaml.Unmarshal(data, &rules); err != nil {
-		return nil, core.TechnicalError().WithAmbit(Ambit).WithCode(CodeParseRules).WithCause(err)
+		return nil, liberr.Tech(CodeParseRules).WithCause(err)
 	}
 
 	return merge(rules, s.catalog), nil
