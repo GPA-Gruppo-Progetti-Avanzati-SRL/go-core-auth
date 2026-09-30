@@ -3,10 +3,10 @@ module github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth
 go 1.27.1
 
 require (
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20260930105625-13fa3448c383
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20260930140542-5b06937a5101
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20260930105625-aace142a2a35
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20260930105625-8efb2abc07d5
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20260930144830-5b3da26a9160
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20260930144830-cda97e2d1c58
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20260930144830-f84943ee0ccd
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20260930144830-7b6f09e06608
 	github.com/danielgtaylor/huma/v2 v2.39.1
 	github.com/rs/zerolog v1.35.1
 	github.com/uptrace/bun v1.2.18
@@ -40,7 +40,7 @@ require (
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/lucasjones/reggen v0.0.0-20200904144131-37ba4fa293bb // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
-	github.com/mattn/go-isatty v0.0.23 // indirect
+	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
