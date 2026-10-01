@@ -1,5 +1,7 @@
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001085827-90e411190ac7 h1:GvarJm5Zww1ua33ILi36B5IeryAk6uNlVDsWhaS3eOI=
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001085827-90e411190ac7/go.mod h1:rXoq016oPfHgSmXBhFNjNT6/vjRl/LQAJPa596ffpYY=
+github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001093936-7e0f6ae28dfd h1:h5VctXn8eQzqL+IL2Vrhy/be6gb5doCd5t4J0SWKm4M=
+github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001093936-7e0f6ae28dfd/go.mod h1:oYr9eKebw/QeX0WRG6PMiXDkpdNp/prUbn7VjTpqUfk=
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20261001091840-5ee8e673dd05 h1:ajsDaqpANq+Z0PfHIuI4U1kPIbOb/LkLibgcPgAjrDQ=
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20261001091840-5ee8e673dd05/go.mod h1:5gGqcCK30s7HuhIHGU/LQrBeP0YnRef8PkG08BnHojs=
 github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20261001085807-dfd196d9ccf9 h1:E7inPx2fc5koXhPta0CK2gqzsGUJD/Hx5Pedu0lkHMc=

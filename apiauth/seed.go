@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	coreapi "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api"
+	"github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api/capability"
 	core "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app"
 	coreauth "github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth"
 	"github.com/danielgtaylor/huma/v2"
@@ -18,7 +19,7 @@ import (
 // delle tabelle acl_* e la forma dei documenti della collection acl li stabiliscono sqlsource e
 // mongosource, e un generatore che li scrive da un altro modulo è una seconda dichiarazione dello
 // stesso schema. Di go-core-api resta ciò che solo lui può sapere — quali capability
-// l'applicazione espone — che arriva da coreapi.Capabilities.
+// l'applicazione espone — che arriva da capability.Capabilities.
 //
 // Gli endpoint sono montati da Register in develop-mode, come gli altri di diagnostica:
 //
@@ -39,7 +40,7 @@ const (
 // Idempotente, sintassi PostgreSQL / SQLite.
 func SeedSQL(api huma.API) string {
 	appID := core.AppName
-	entries := coreapi.Capabilities(api)
+	entries := capability.Capabilities(api)
 	var sb strings.Builder
 
 	sb.WriteString("-- Capability di " + appID + " per go-core-auth/sqlsource.\n")
@@ -55,7 +56,7 @@ func SeedSQL(api huma.API) string {
 				"    category = EXCLUDED.category, description = EXCLUDED.description,\n"+
 				"    operation_id = EXCLUDED.operation_id, api_path = EXCLUDED.api_path,\n"+
 				"    api_methods = EXCLUDED.api_methods, app_id = EXCLUDED.app_id;\n\n",
-			sqlStr(coreapi.CapabilityID(appID, e.ID)), sqlStr(e.Category), sqlStr(descriptionOf(e)),
+			sqlStr(capability.CapabilityID(appID, e.ID)), sqlStr(e.Category), sqlStr(descriptionOf(e)),
 			sqlStr(operationIDOf(e)), sqlStr(e.Endpoint), sqlStr(e.Method), sqlStr(appID),
 		)
 	}
@@ -71,7 +72,7 @@ func SeedSQL(api huma.API) string {
 		fmt.Fprintf(&sb,
 			"INSERT INTO acl_capability_group_item (group_id, capability_id) VALUES (%s, %s)\n"+
 				"ON CONFLICT (group_id, capability_id) DO NOTHING;\n",
-			sqlStr(groupID), sqlStr(coreapi.CapabilityID(appID, e.ID)),
+			sqlStr(groupID), sqlStr(capability.CapabilityID(appID, e.ID)),
 		)
 	}
 	return sb.String()
@@ -80,7 +81,7 @@ func SeedSQL(api huma.API) string {
 // SeedMongo rende lo script di upsert per la collection acl letta da go-core-auth/mongosource.
 func SeedMongo(api huma.API) string {
 	appID := core.AppName
-	entries := coreapi.Capabilities(api)
+	entries := capability.Capabilities(api)
 	var sb strings.Builder
 
 	sb.WriteString("// Capability di " + appID + " per go-core-auth/mongosource.\n")
@@ -90,7 +91,7 @@ func SeedMongo(api huma.API) string {
 
 	ids := make([]string, 0, len(entries))
 	for _, e := range entries {
-		id := coreapi.CapabilityID(appID, e.ID)
+		id := capability.CapabilityID(appID, e.ID)
 		ids = append(ids, id)
 
 		doc := seedCapDoc{
@@ -146,17 +147,17 @@ func writeUpsert(sb *strings.Builder, id string, doc any) {
 }
 
 // descriptionOf: una capability senza descrizione resta comunque riconoscibile dal suo id.
-func descriptionOf(e coreapi.CapabilityEntry) string {
+func descriptionOf(e capability.CapabilityEntry) string {
 	if e.Description != "" {
 		return e.Description
 	}
 	return e.ID
 }
 
-// operationIDOf restituisce l'operationId di huma. coreapi.Capabilities lo omette quando coincide
+// operationIDOf restituisce l'operationId di huma. capability.Capabilities lo omette quando coincide
 // con l'id della capability, ma nel seed va scritto comunque: è il campo con cui un ACL basato
 // sull'operationId trova la capability.
-func operationIDOf(e coreapi.CapabilityEntry) string {
+func operationIDOf(e capability.CapabilityEntry) string {
 	if e.OperationID != "" {
 		return e.OperationID
 	}

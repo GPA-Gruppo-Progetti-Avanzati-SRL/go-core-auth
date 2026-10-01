@@ -203,7 +203,7 @@ La serializzazione sta qui e non in `go-core-api` perché **lo schema è di ques
 delle tabelle e la forma dei documenti li stabiliscono `sqlsource` e `mongosource`, e un generatore
 che li scrivesse da un altro modulo sarebbe una seconda dichiarazione dello stesso schema. Di
 `go-core-api` arriva soltanto ciò che solo lui può sapere — quali capability l'API espone, dedotte
-dal registry huma (`coreapi.Capabilities`, `coreapi.CapabilityID`). Il presidio dell'allineamento è
+dal registry huma (`capability.Capabilities`, `capability.CapabilityID` di go-core-api). Il presidio dell'allineamento è
 in `seed_test.go`, che confronta le colonne generate con `sqlsource.Schema()`.
 
 I seed sono montati anche quando il middleware è spento: descrivono ciò che l'API espone, e servono

@@ -3,7 +3,7 @@ module github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth
 go 1.27.1
 
 require (
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001085827-90e411190ac7
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001093936-7e0f6ae28dfd
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20261001091840-5ee8e673dd05
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20261001085807-dfd196d9ccf9
 	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20261001085812-19150dfd11af
