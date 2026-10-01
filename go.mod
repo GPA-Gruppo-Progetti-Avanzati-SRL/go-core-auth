@@ -3,10 +3,10 @@ module github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-auth
 go 1.27.1
 
 require (
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20260930155225-28b964bf4447
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20260930155225-6ce10256d1c2
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20260930155224-1a71bac1d9bc
-	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20260930155225-0fbda2674d67
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-api v0.0.24-0.20261001084839-9e5bb89e91c6
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-app v0.0.29-0.20261001084825-623960b02ee8
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-mongo v0.0.20-0.20261001084839-ea3b4aac0bf0
+	github.com/GPA-Gruppo-Progetti-Avanzati-SRL/go-core-sql v0.0.2-0.20261001084839-56e3fd761c88
 	github.com/danielgtaylor/huma/v2 v2.39.1
 	github.com/rs/zerolog v1.35.1
 	github.com/uptrace/bun v1.2.18
