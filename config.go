@@ -49,8 +49,9 @@ type MongoConfig struct {
 // (acl_*), come go-core-sql/locker fa con scheduler_locks. Lo schema in cui vivono lo sceglie la
 // connessione, che è dove quella scelta è già espressa.
 
-// YAMLConfig configura la sorgente yaml: il file delle regole (capability-group e ruoli). App,
-// contesti e capability scoperte al boot le passa il chiamante, perché non vengono da lì.
+// YAMLConfig configura la sorgente yaml: il file delle regole, riletto a ogni caricamento. Può
+// dichiarare tutto l'ACL (contexts, apps, capabilities, capability-groups, roles); le capability
+// scoperte al boot si aggiungono passando un Catalog, perché il file non le può conoscere.
 type YAMLConfig struct {
 	RulesFile string `yaml:"rules-file" mapstructure:"rules-file" json:"rules-file"`
 }
